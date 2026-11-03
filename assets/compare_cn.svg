@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400">
+<rect width="1280" height="400" rx="18" fill="#0b1220"/>
+<text x="40.0" y="52.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="22" font-weight="700" fill="#e6edf7" text-anchor="start" >参数化楔面激波 PINN：覆盖范围与精度对比</text>
+<text x="40.0" y="96.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#93a3bd" text-anchor="start" >工作</text>
+<text x="300.0" y="96.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#93a3bd" text-anchor="start" >马赫数范围</text>
+<text x="560.0" y="96.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#93a3bd" text-anchor="start" >楔角范围</text>
+<text x="800.0" y="96.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#93a3bd" text-anchor="start" >最大压比</text>
+<text x="990.0" y="96.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#93a3bd" text-anchor="start" >激波角误差</text>
+<text x="1130.0" y="96.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#93a3bd" text-anchor="start" >场误差*</text>
+<line x1="40" y1="110" x2="1240" y2="110" stroke="#24314d"/>
+<text x="40.0" y="148.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#e6edf7" text-anchor="start" >Wassing 等 2024</text>
+<text x="40.0" y="170.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="12" font-weight="400" fill="#93a3bd" text-anchor="start" >Comput. Fluids  ·  自适应粘性</text>
+<rect x="300" y="143" width="220" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<rect x="300.0" y="143" width="55.0" height="14" rx="7" fill="#93a3bd"/>
+<text x="300.0" y="176.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >Ma 2–3（坐标 2–6）</text>
+<rect x="560" y="143" width="200" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<circle cx="660.0" cy="150" r="7" fill="#93a3bd"/>
+<text x="560.0" y="176.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >θ = 10° 固定</text>
+<rect x="800" y="143" width="150" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<rect x="800" y="143" width="32.4" height="14" rx="7" fill="#93a3bd"/>
+<text x="800.0" y="176.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >≤ 2.05</text>
+<text x="990.0" y="156.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#e6edf7" text-anchor="start" >&lt; 1°</text>
+<text x="1130.0" y="156.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#e6edf7" text-anchor="start" >0.5–0.7%</text>
+<text x="40.0" y="226.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#e6edf7" text-anchor="start" >Tian 等 2026</text>
+<text x="40.0" y="248.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="12" font-weight="400" fill="#93a3bd" text-anchor="start" >力学学报  ·  激波探测器引导粘性</text>
+<rect x="300" y="221" width="220" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<rect x="300.0" y="221" width="55.0" height="14" rx="7" fill="#93a3bd"/>
+<text x="300.0" y="254.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >Ma 2–3（坐标 2–6）</text>
+<rect x="560" y="221" width="200" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<text x="560.0" y="254.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >固定，未注明</text>
+<text x="800.0" y="233.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="16" font-weight="400" fill="#93a3bd" text-anchor="start" >—</text>
+<text x="990.0" y="234.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#e6edf7" text-anchor="start" >&lt; 0.2°</text>
+<text x="1130.0" y="234.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#e6edf7" text-anchor="start" >—</text>
+<rect x="28" y="276" width="1224" height="74" rx="12" fill="#0f2236" stroke="#38bdf8" stroke-opacity="0.6"/>
+<text x="40.0" y="304.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#38bdf8" text-anchor="start" >本仓库</text>
+<text x="40.0" y="326.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="12" font-weight="400" fill="#93a3bd" text-anchor="start" >models/param_B1_w192  ·  只用方程</text>
+<rect x="300" y="299" width="220" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<rect x="355.0" y="299" width="165.0" height="14" rx="7" fill="#38bdf8"/>
+<text x="300.0" y="332.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >Ma 3–6（坐标 2–6）</text>
+<rect x="560" y="299" width="200" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<rect x="610.0" y="299" width="150.0" height="14" rx="7" fill="#38bdf8"/>
+<text x="560.0" y="332.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >θ 5–20°  (坐标 0–20°)</text>
+<rect x="800" y="299" width="150" height="14" rx="7" fill="#121b2f" stroke="#24314d"/>
+<rect x="800" y="299" width="146.1" height="14" rx="7" fill="#38bdf8"/>
+<text x="800.0" y="332.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="400" fill="#93a3bd" text-anchor="start" >≤ 9.25</text>
+<text x="990.0" y="312.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#38bdf8" text-anchor="start" >0.09° / 0.17°</text>
+<text x="1130.0" y="312.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#38bdf8" text-anchor="start" >0.27%</text>
+<text x="40.0" y="372.0" font-family="'Segoe UI','PingFang SC','Microsoft YaHei','Noto Sans CJK SC',Helvetica,Arial,sans-serif" font-size="12" font-weight="400" fill="#93a3bd" text-anchor="start" >* 场量逐点平均相对误差；本仓库为 16 个工况的平均：ρ 0.27%，p 0.49%（相对 L2：ρ 3.0%，p 4.4%）。文献数字取自原文，指标定义可能略有差异。</text>
+</svg>

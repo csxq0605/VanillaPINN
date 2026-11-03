@@ -2,7 +2,7 @@
 
     python make_figures.py [model_dir]        (default ../models/param_B1_w192, runs on CPU in ~5 min)
 
-Writes ../assets/banner.png, ../assets/fields_grid.png, ../assets/error_map.png, ../assets/ablation_path.png
+Writes ../assets/fields_grid.png, ../assets/error_map.png, ../assets/ablation_path.png
 and ../results/parametric/final_eval.md (16 cases vs the exact oblique-shock solution, evaluation window y <= 0.9).
 """
 import json
@@ -42,26 +42,6 @@ def pressure_field(ma, td, nx=420, ny=300):
     p[y < x.clamp(min=0) * math.tan(th)] = float("nan")
     return p.reshape(nx, ny).T.numpy()
 
-
-# ---------------------------------------------------------------- banner: one network, several (Ma, theta)
-cases = [(3.0, 20.0), (3.5, 12.5), (4.5, 17.0), (5.0, 10.0), (6.0, 15.0)]
-fig, axs = plt.subplots(1, len(cases), figsize=(16, 3.6), facecolor="#0d1117")
-for ax, (ma, td) in zip(axs, cases):
-    p = pressure_field(ma, td)
-    be, _ = oblique_shock(ma, math.radians(td))
-    ax.imshow(p, origin="lower", extent=[-0.05, cfg.x1, 0, 0.9], cmap="magma", aspect="auto")
-    ax.plot([0, cfg.x1], [0, cfg.x1 * math.tan(be)], color="#7ee0ff", lw=0.8, ls="--")
-    ax.fill_between([0, cfg.x1], [0, 0], [0, cfg.x1 * math.tan(math.radians(td))], color="#30363d")
-    ax.set_title(f"Ma {ma:g}, θ {td:g}°", color="#e6edf3", fontsize=12)
-    ax.set_xticks([]); ax.set_yticks([])
-    for s in ax.spines.values():
-        s.set_color("#30363d")
-fig.suptitle("One equation-only PINN for the whole (Ma, θ) plane — pressure, dashed = exact shock",
-             color="#e6edf3", fontsize=14, y=0.99)
-fig.tight_layout(rect=(0, 0, 1, 0.93))
-fig.savefig(os.path.join(ASSETS, "banner.png"), dpi=110, facecolor=fig.get_facecolor())
-plt.close(fig)
-print("banner done", flush=True)
 
 # ---------------------------------------------------------------- 16-case evaluation
 mas, ths = [3.0, 4.0, 5.0, 6.0], [5.0, 10.0, 15.0, 20.0]
