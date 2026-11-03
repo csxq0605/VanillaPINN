@@ -1,144 +1,117 @@
-![VanillaPINN banner](./assets/banner.png)
+![banner](./assets/banner.png)
 
-[![English](https://img.shields.io/badge/English-README-blue?logo=github)](README.md)
-[![中文](https://img.shields.io/badge/中文-README-green?logo=github)](README_CN.md)
-[![Docs](https://img.shields.io/badge/文档-方法%20%7C%20消融-red?logo=googledocs&logoColor=white)](docs/method.md)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.5-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org)
-[![Python](https://img.shields.io/badge/Python-3.10-3776ab?logo=python&logoColor=white)](https://www.python.org)
+[English](README.md) | **中文**
 
-VanillaPINN 是北京大学本科科研项目的代码：用物理信息神经网络（PINN）求解**超声速楔面流动和斜激波**，最终目标是斜爆轰波（ODW）。
+# VanillaPINN：超声速楔面斜激波的物理信息神经网络求解
 
-核心成果是**一个只靠方程训练、覆盖整个 (Ma, θ) 平面的参数化网络**：
-- 输入是 (x, y, 马赫数, 楔角)。
-- 不给 RH 条件，不给激波位置，也不按激波位置加点。
-- 在 Ma 3–6 × θ 5–20° 范围内，激波角误差**平均 0.09°、最大 0.17°**。
-- 离激波稍远（±0.03 L 以外），流场误差只有 **0.2%**。
+## 仓库简介
 
-> 只靠方程，一次给出所有马赫数和楔角下的激波。
+本仓库是**北京大学本科科研项目**的代码与成果汇总，研究方向是用物理信息神经网络（PINN）求解含激波的可压缩流动。
 
-# 🚀 快速开始
+- **研究对象：** 超声速来流过楔面产生的附体斜激波，控制方程为二维定常无粘可压缩 Euler 方程（γ = 1.4）。
+- **长期目标：** 斜爆轰波（ODW）。斜激波是它的前导结构，也是 PINN 处理间断问题的典型难点。
+- **两个核心问题：**
+  - **精度：** 激波是间断，光滑的神经网络很难表示。早期代码的激波角误差在 1° 以上。
+  - **泛化：** 能不能用**一个网络**覆盖一整片马赫数和楔角范围，而不是每个工况单独训练？
 
-### 环境
+仓库包含求解器代码（`wedge_pinn/`）、最终模型、实验结果和文档。
 
-| 项目 | 本项目使用 |
-|---|---|
-| **Python** | 3.10 |
-| **PyTorch** | 2.5.1 + CUDA 12（评估可以只用 CPU） |
-| **GPU** | RTX 4060 8 GB，一次只跑一个训练；每段 500 步 L-BFGS 约 35–70 分钟 |
-| **其他** | numpy、scipy、matplotlib（`pip install -r requirements.txt`） |
+## 研究内容
 
-### 评估发布的模型（CPU，约 5 分钟）
+项目分三个阶段推进：
 
-```bash
-git clone https://github.com/csxq0605/VanillaPINN.git
-cd VanillaPINN/wedge_pinn
-pip install -r ../requirements.txt
-python diag_param/eval_param.py ../models/param_B1_w192        # 16 个工况对理论解的逐工况表
-python make_figures.py                                           # 图在 assets/，表在 results/parametric/
-```
-
-### 任意 (Ma, θ) 下取值
-
-```python
-import json, math, torch
-from param_pinn import PConfig, ParamPINN, predict
-cfg = PConfig(**json.load(open("../models/param_B1_w192/config.json")))
-net = ParamPINN(cfg); net.load_state_dict(torch.load("../models/param_B1_w192/model_final.pt", map_location="cpu")); net.eval()
-x, y = torch.rand(1000), 0.5 * torch.rand(1000)
-q = predict(net, x, y, 4.5, math.radians(12.5), torch.device("cpu"))   # 各列为 u, v, ρ, p（ρ∞ = p∞ = 1）
-```
-
-### 训练
-
-```bash
-cd wedge_pinn
-bash scripts/train_param.sh            # 参数化模型：完整的接续训练链（单张 8 GB 显卡约 12–14 小时）
-python capture_lv.py --width 64 --depth 6 --normalize_inputs true --nu_wall 0.05 --n_rad 10000 \
-       --rad_every 200 --rad_until 400 --w_weak 10 --adam_iters 500 --nu_min 2e-3 --tag lvf   # 单工况：激波捕捉
-python refine.py --capture runs/<捕捉的 run 目录> --tag refine                                    # 自动识别 + 激波装配精修
-```
-
-所有配置项都可以用 `--字段名 值` 覆盖，字段定义见 `param_pinn.py`、`capture_lv.py`、`shockfit.py` 顶部的 dataclass。
-
-# ✨ 关键创新点
-
-| 创新点 | 说明 |
-|---|---|
-| **🧮 只用方程的激波捕捉** | 方程是粘性 Euler 方程，常数人工粘性逐步减小（4e-3 → 7e-4）。RH 跳跃条件由粘性消失极限自动满足，从不手工加入。 |
-| **🎛️ 参数调制首层** | 首层权重由 (Ma, θ) 的小网络生成。激波面 y = x·tanβ(Ma, θ) 在输入空间里不是平面，这样神经元能随它一起转动（思路来自 shift-DeepONet / HyperPINN）。 |
-| **⚖️ 各守恒律按自身通量归一** | 不归一时，能量方程的权重约为质量方程的 440 倍。只改这一项，激波角平均误差就从 0.76° 降到 0.48°。 |
-| **📐 楔尖角点加权** | 残差乘以 r²/(r²+δ²)，即 Kondratiev 型角点加权范数，处理楔尖这个几何奇点，只用到几何。 |
-| **🔗 壁面增广拉格朗日** | 消除罚函数法"牺牲壁面条件、换一道更弱的激波"的偏差，壁面少转从 0.6–2.6° 降到 0.1–0.7°。 |
-| **🎯 四维残差自适应加点** | 在 (x, y, Ma, θ) 里按残差重新采样，点自然集中到激波面上，不需要任何激波信息。 |
-| **🧱 放宽训练参数域，保持函数不变地加宽网络** | 训练参数域比使用范围宽一圈，消除参数域边、角上的误差；`widen_model.py` 加宽网络而不改变输出（差别 < 4e-7）。 |
-| **🔬 捕捉 → 识别 → 装配流程** | 单工况上先捕捉激波、自动识别，再用显式激波曲线精修。激波角误差 ≤ 0.007°，对精确解的扰动 L2 ≤ 7e-4。 |
-| **🩺 诊断工具** | `wedge_pinn/diag_param/` 下共 16 个脚本，包括跨激波守恒检查、激波带内外误差和厚度下限、激波角精测、角点细扫、二维误差 / 熵 / 残差图等。 |
-
-# 📊 结果
-
-**参数化模型**（`models/param_B1_w192`，16 个工况对理论精确解，评估窗口 y ≤ 0.9，[逐工况表](results/parametric/final_eval.md)）：
-
-| | 平均 | 最大 |
+| 阶段 | 内容 | 代码 |
 |---|---|---|
-| 激波角误差 | 0.09° | 0.17° |
+| 1. 基线 | 全连接 PINN，配合逐点可学习人工粘性，求解 Ma 5、10° 楔面，以 OpenFOAM 为参考（早期代码，未收录） | — |
+| 2. 单工况高精度 | 三步流程：激波捕捉 PINN（无激波先验）→ 从结果中自动识别激波 → 激波装配 PINN 精修（显式激波曲线 + RH 条件） | `wedge_pinn/capture_lv.py`、`refine.py`、`shockfit.py` |
+| 3. 参数化、只用方程 | 网络输入 (x, y, Ma, θ)，一个模型覆盖 Ma 3–6 × θ 5–20°。**全程不使用任何激波先验**：不给 RH 条件、不给激波位置、不按激波位置加点，只靠方程本身及其离散方式 | `wedge_pinn/param_pinn.py` |
+
+第 3 阶段是主要工作。所用的每个组成部分都对应一条理论依据：
+- **粘性消失法：** 常数人工粘性逐步减小，使 RH 条件自动满足。
+- **参数调制首层：** 让神经元能随激波面一起转动。
+- **按各守恒律自身通量归一：** 平衡质量、动量、能量方程的权重。
+- **楔尖角点加权：** 处理楔尖这个几何奇点。
+- **壁面增广拉格朗日：** 消除罚函数法带来的偏差。
+- **四维残差自适应加点：** 点自然集中到激波面上。
+- **放宽训练参数域：** 消除参数域边、角上的误差。
+- **保持函数不变地加宽网络：** 从已有解出发增大容量。
+
+详见[方法说明](docs/method.md)。
+
+## 主要成果
+
+### 1. 一个网络覆盖整个 (Ma, θ) 平面，只用方程（最终模型 `models/param_B1_w192`）
+
+在 Ma {3, 4, 5, 6} × θ {5°, 10°, 15°, 20°} 共 16 个工况上，与斜激波理论精确解对比（[逐工况表](results/parametric/final_eval.md)）：
+
+| 指标 | 平均 | 最大 |
+|---|---|---|
+| 激波角误差 | **0.09°** | **0.17°** |
 | ρ 相对 L2 | 3.0% | 5.2% |
 | p 相对 L2 | 4.4% | 8.0% |
 
-p 的 4.4% 里有 **3.0 个百分点是激波厚度下限**，即一道位置完全正确、只是有同样厚度的激波也会有的误差。离激波 ±0.03 L 以外，误差只有 0.2%。用激波后压力反推的激波角，平均误差只有 0.04°。
+- 场误差几乎全部集中在激波那条窄带里。离激波 ±0.03 L 以外，误差只有 **0.2%**。
+- p 的 4.4% 中有 3.0 个百分点来自激波厚度本身：一道位置完全正确、只是有同样厚度的激波，也会有这么大的误差。
+- 由激波后压力反推的激波角，平均误差只有 0.04°。
+- 起点是普通 MLP（激波角误差平均 5.1°、最大 8.4°，ρ 19%），逐项改进后降到上面的结果，下图是这条路径。
 
 ![误差分布](assets/error_map.png)
 
-**单工况，Ma 5**（捕捉 → 识别 → 装配）：
+### 2. 单工况：捕捉 → 识别 → 装配（Ma 5，对精确解）
 
-| 算例 | 激波角（精确） | 对精确解扰动 L2（u, v, ρ, p） |
+| 算例 | 激波角（精确值） | 扰动 L2（u, v, ρ, p） |
 |---|---|---|
 | 10° 楔面 | 19.375–19.378°（19.376°） | 4.9e-4, 1.5e-4, 2.2e-4, 2.4e-4 |
 | 15° 楔面 | 24.324–24.329°（24.322°） | 4.1e-4, 3.7e-5, 6.6e-4, 8.7e-5 |
 
-单靠激波捕捉、不给先验时（10°，3 个随机种子），对 OpenFOAM 的全场相对 L2 为 ρ 1.0–1.3%、p 1.8–2.5%。
+- **单靠捕捉（不给任何先验）：** 10° 算例对 OpenFOAM 的全场相对 L2 为 ρ 1.0–1.3%、p 1.8–2.5%（3 个随机种子），和 CFD 自身相对精确解的误差（ρ 1.5%、p 2.6%）相当。
+- **精修后：** 与 CFD 剩下约 9% 的扰动差，正好是 CFD 数值耗散把激波抹宽造成的偏差。
+- **对比基线：** 同一算例上，早期 vanilla PINN 最好的模型激波角为 18.98°，而且是按 CFD 验证误差挑出来的。
 
-# 🧪 消融实验
+### 3. 消融实验
 
-参数化模型是一段段接着训出来的，每一段只改一项。下图是主线上激波角平均误差和 ρ L2 的变化。完整表格（包括没用的做法）见 **[docs/ablations.md](docs/ablations.md)**。试过但没用的做法：
+主线上每一步只改一项，每一步的效果和试过但没用的做法都记录在[消融实验](docs/ablations.md)里。没用的做法包括：
 - 可学习粘性
 - 极坐标输入
 - 镜面壁面条件
 - 快照平均
-- 增加 RAD 点数
-- 粘性 5e-4（宽度 128 和 192 都试过）
+- 增加配点
+- 更低的粘性
 
 ![消融路径](assets/ablation_path.png)
 
-# 📁 目录结构
+## 仓库内容
 
 ```
 VanillaPINN/
-├── wedge_pinn/                 # 主体代码
-│   ├── param_pinn.py           # 参数化、只用方程的 PINN，输入 (x, y, Ma, θ)
-│   ├── capture_lv.py           # 单工况激波捕捉 PINN
-│   ├── refine.py, shockfit.py  # 自动识别激波 + 激波装配精修
-│   ├── physics.py, model.py, data.py, evaluate.py
-│   ├── widen_model.py          # 保持函数不变地加宽网络
-│   ├── make_figures.py         # 为发布的模型生成图和表
-│   ├── diag_param/             # 参数化模型的诊断脚本
-│   ├── scripts/train_param.sh  # 发布模型的完整训练链
-│   ├── data/                   # OpenFOAM 参考解缓存（10°、15°）和 Fluent 网格点
-│   └── capture.py, train.py, main.py, diag_*.py, compare.py, summarize.py   # 对照实验和单工况工具
-├── models/param_B1_w192/       # 发布的模型（config.json 是评估窗口，train_config.json 是训练配置）
-├── results/                    # 参数化 16 工况表、单工况各方法对比表和图
-├── docs/                       # 方法说明、消融实验、文献调研
-├── assets/                     # README 用图
-└── legacy/vanilla_fnn/         # 本仓库最初的 vanilla PINN 代码
+├── wedge_pinn/                 # 重写后的求解器
+│   ├── param_pinn.py           # 第 3 阶段：参数化、只用方程的 PINN
+│   ├── capture_lv.py           # 第 2 阶段：激波捕捉 PINN
+│   ├── refine.py, shockfit.py  # 第 2 阶段：自动识别激波 + 激波装配精修
+│   ├── physics.py, model.py, data.py, evaluate.py   # 斜激波理论解、Euler 残差、网络、采样、评估
+│   ├── diag_param/             # 诊断：跨激波守恒、误差拆分、激波角精测、参数域角点扫描等
+│   ├── scripts/train_param.sh  # 最终模型的完整训练链
+│   ├── make_figures.py         # 生成本页的图和结果表
+│   └── data/                   # OpenFOAM 参考解缓存（10°、15°）
+├── models/param_B1_w192/       # 最终参数化模型
+├── results/                    # 参数化 16 工况结果、单工况各方法对比
+└── docs/                       # 方法说明、消融实验、文献调研
 ```
 
-# 📖 文档
+## 使用
 
-- **[方法说明](docs/method.md)**：问题设置、两条路线，以及每个组成部分的理论依据
-- **[消融实验](docs/ablations.md)**：全部消融表和没用的做法
-- **[文献调研](docs/literature_survey_cn.md)**：PINN 处理激波的方法，分为"只依赖方程"和"强先验"两类
+环境：Python 3.10、PyTorch 2.5（训练用 RTX 4060 8 GB；评估可以只用 CPU），依赖见 `requirements.txt`。
 
-# 🗺️ 下一步
+```bash
+cd wedge_pinn
+python diag_param/eval_param.py ../models/param_B1_w192   # 评估最终模型（CPU，约 5 分钟）
+bash scripts/train_param.sh                                # 从头训练参数化模型（约 12–14 小时）
+```
 
-- **斜爆轰波：** 加入组分或反应进度和对应的源项（单步 Arrhenius，或两步诱导–放热模型）。前导激波就是这里已经解决的斜激波。
-- **更薄的激波：** 粘性降到 7e-4 以下，需要比目前更大的网络容量或分辨率。
-- **参数化的激波装配：** 精修网络和激波曲线都以 (Ma, θ) 为条件。
+单工况流程的命令见[方法说明](docs/method.md)。所有配置项都可以用 `--字段名 值` 覆盖。
+
+## 下一步
+
+- **斜爆轰波：** 加入化学反应源项。前导激波沿用本仓库的方法。
+- **更薄的激波：** 粘性降到 7e-4 以下，需要更大的网络容量或分辨率。
+- **参数化的激波装配精修：** 精修网络和激波曲线都以 (Ma, θ) 为条件。

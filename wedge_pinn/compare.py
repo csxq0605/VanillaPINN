@@ -21,7 +21,7 @@ from data import WedgeDomain, load_reference
 import evaluate as ev
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OLD = os.environ.get("VANILLA_PINN_DIR", os.path.join(HERE, "..", "legacy", "vanilla_pinn_runs"))  # old checkpoints, not in the repo
+OLD = os.environ.get("VANILLA_PINN_DIR", os.path.join(HERE, "..", "..", "vanilla_Pinn"))  # early vanilla PINN checkpoints, not in the repo
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 
 
